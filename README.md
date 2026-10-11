@@ -37,26 +37,6 @@ uvicorn app.main:app --port 8000
 include sample data or a seed script; provide employee and attendance documents in MongoDB before trying data-dependent
 routes. The assignment grader supplies its own dataset.
 
-## Tests
-
-The tests use a local MongoDB server and create uniquely named disposable databases, which are dropped after each run.
-Set `TEST_MONGO_URI` to another **loopback** MongoDB port if needed. Run the regular suite with:
-
-```powershell
-python -m unittest discover -s tests
-```
-
-An opt-in scale test seeds 100,000 attendance records in its own disposable database and checks the five explain plans:
-
-```powershell
-$env:RUN_SCALE_TESTS = "1"
-python -m unittest discover -s tests
-Remove-Item Env:RUN_SCALE_TESTS
-```
-
-The tests cover key rules, concurrency, validation, analytics edge cases, and index plans. They do not replace evaluation
-against the grader's hidden dataset.
-
 ## Submission
 
 Submit a public Git repository containing the application, requirements, review, decisions, and this README. Do not
