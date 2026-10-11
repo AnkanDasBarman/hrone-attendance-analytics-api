@@ -19,27 +19,43 @@ py -3.11 -m venv .venv
 pip install -r requirements.txt
 ```
 
-Set `MONGO_URI` and `MONGO_DB` in your environment, or copy `.env.example` to `.env` and adjust it for your local
-MongoDB. Environment variables take precedence over `.env`. Start the API:
+Set the `MONGO_URI` and `MONGO_DB` environment variables for your MongoDB instance before starting the API. For example,
+in PowerShell:
+
+```powershell
+$env:MONGO_URI = "mongodb://127.0.0.1:27017"
+$env:MONGO_DB = "attendance_db"
+```
+
+Start the API:
 
 ```powershell
 uvicorn app.main:app --port 8000
 ```
 
-`GET /health` checks MongoDB connectivity. Indexes are created automatically at startup. If you want to load the sample
-documents, configure a **disposable local database** first: `python sample_seed.py` replaces the contents of its
-`employees` and `attendance_logs` collections.
+`GET /health` checks MongoDB connectivity. Indexes are created automatically at startup. This repository does not
+include sample data or a seed script; provide employee and attendance documents in MongoDB before trying data-dependent
+routes. The assignment grader supplies its own dataset.
 
 ## Tests
 
-Run the regression tests with:
+The tests use a local MongoDB server and create uniquely named disposable databases, which are dropped after each run.
+Set `TEST_MONGO_URI` to another **loopback** MongoDB port if needed. Run the regular suite with:
 
 ```powershell
 python -m unittest discover -s tests
 ```
 
-The bundled sample data is only a small shape/example dataset; it does not cover all assignment edge cases or guarantee
-analytics correctness on the grader's larger dataset.
+An opt-in scale test seeds 100,000 attendance records in its own disposable database and checks the five explain plans:
+
+```powershell
+$env:RUN_SCALE_TESTS = "1"
+python -m unittest discover -s tests
+Remove-Item Env:RUN_SCALE_TESTS
+```
+
+The tests cover key rules, concurrency, validation, analytics edge cases, and index plans. They do not replace evaluation
+against the grader's hidden dataset.
 
 ## Submission
 
